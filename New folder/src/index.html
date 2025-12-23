@@ -1,0 +1,1265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BVG Ticket Machine</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #111827;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .machine-container {
+            width: 1280px;
+            height: 980px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .header {
+            
+    background-color: #FFD500;
+    color: #000; /* Black text for contrast */
+
+
+            color: black;
+            padding: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .logo {
+            width: 64px;
+            height: 64px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #dc2626;
+            font-weight: bold;
+            font-size: 20px;
+        }
+
+        .header-title h1 {
+            font-size: 28px;
+            margin-bottom: 4px;
+        }
+
+        .header-title p {
+            opacity: 0.9;
+            font-size: 16px;
+        }
+
+        .lang-badge {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .content {
+            flex: 1;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .page {
+            display: none;
+            height: 100%;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        .footer {
+            background: #f3f4f6;
+            padding: 16px;
+            display: flex;
+            gap: 16px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 16px;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+
+        .btn-back {
+            background: #6b7280;
+            color: white;
+        }
+
+        .btn-back:hover {
+            background: #4b5563;
+        }
+
+        .btn-continue {
+            background: #dc2626;
+            color: white;
+        }
+
+        .btn-continue:hover {
+            background: #b91c1c;
+        }
+
+        /* Language Selection Page */
+        .language-page {
+            padding: 48px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .language-header {
+            text-align: center;
+            margin-bottom: 48px;
+        }
+
+        .language-icon {
+            font-size: 96px;
+            margin-bottom: 16px;
+        }
+
+        .language-header h2 {
+            font-size: 32px;
+            color: #111827;
+            margin-bottom: 8px;
+        }
+
+        .language-header p {
+            font-size: 18px;
+            color: #6b7280;
+        }
+
+        .language-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            width: 100%;
+            max-width: 900px;
+            margin-bottom: 32px;
+        }
+
+        .language-btn {
+            padding: 24px;
+            border: 4px solid #e5e7eb;
+            border-radius: 12px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .language-btn:hover {
+            border-color: #dc2626;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .language-flag {
+            font-size: 64px;
+        }
+
+        .language-name h3 {
+            font-size: 24px;
+            color: #111827;
+            margin-bottom: 4px;
+        }
+
+        .language-name p {
+            font-size: 18px;
+            color: #6b7280;
+        }
+
+        .info-box {
+            background: #dbeafe;
+            border-left: 4px solid #3b82f6;
+            padding: 16px;
+            border-radius: 8px;
+            display: flex;
+            gap: 12px;
+            max-width: 900px;
+            width: 100%;
+        }
+
+        .info-icon {
+            font-size: 24px;
+        }
+
+        .info-text strong {
+            display: block;
+            margin-bottom: 4px;
+            color: #111827;
+        }
+
+        .info-text {
+            color: #374151;
+            line-height: 1.5;
+        }
+
+        /* Zone Selection Page */
+        .zone-page {
+            padding: 48px;
+        }
+
+        .zone-header {
+            margin-bottom: 32px;
+        }
+
+        .zone-header h2 {
+            font-size: 32px;
+            color: #111827;
+            margin-bottom: 8px;
+        }
+
+        .zone-header p {
+            font-size: 18px;
+            color: #6b7280;
+        }
+
+        .zone-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .zone-btn {
+            padding: 32px;
+            border: 4px solid #e5e7eb;
+            border-radius: 12px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: flex-start;
+            gap: 24px;
+        }
+
+        .zone-btn:hover {
+            border-color: #d1d5db;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .zone-btn.selected {
+            border-color: #3b82f6;
+            background: #eff6ff;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            transform: scale(1.01);
+        }
+
+        .zone-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 32px;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        .zone-icon.blue { background: #3b82f6; }
+        .zone-icon.green { background: #10b981; }
+        .zone-icon.purple { background: #8b5cf6; }
+
+        .zone-info {
+            flex: 1;
+        }
+
+        .zone-info h3 {
+            font-size: 24px;
+            color: #111827;
+            margin-bottom: 8px;
+        }
+
+        .zone-info .description {
+            font-size: 18px;
+            color: #374151;
+            margin-bottom: 8px;
+        }
+
+        .zone-info .coverage {
+            font-size: 16px;
+            color: #6b7280;
+        }
+
+        .zone-check {
+            font-size: 40px;
+            color: #3b82f6;
+        }
+
+        .warning-box {
+            background: #fef3c7;
+            border-left: 4px solid #f59e0b;
+            padding: 16px;
+            border-radius: 8px;
+        }
+
+        .warning-box strong {
+            display: block;
+            margin-bottom: 4px;
+            color: #111827;
+        }
+
+        .warning-box p {
+            color: #374151;
+            line-height: 1.5;
+            margin-bottom: 8px;
+        }
+
+        /* Ticket Purchase Page */
+        .purchase-page {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            height: 100%;
+        }
+
+        .ticket-section {
+            padding: 32px;
+            border-right: 1px solid #e5e7eb;
+            overflow-y: auto;
+        }
+
+        .payment-section {
+            padding: 32px;
+            background: #f9fafb;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .section-header {
+            margin-bottom: 24px;
+        }
+
+        .zone-badge {
+            display: inline-block;
+            background: #dbeafe;
+            color: #1e40af;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            margin-bottom: 12px;
+        }
+
+        .section-header h2 {
+            font-size: 28px;
+            color: #111827;
+            margin-bottom: 4px;
+        }
+
+        .section-header p {
+            font-size: 16px;
+            color: #6b7280;
+        }
+
+        .ticket-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .ticket-btn {
+            padding: 20px;
+            border: 4px solid #e5e7eb;
+            border-radius: 12px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .ticket-btn:hover {
+            border-color: #d1d5db;
+        }
+
+        .ticket-btn.selected {
+            border-color: #dc2626;
+            background: #fef2f2;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .ticket-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            flex-shrink: 0;
+        }
+
+        .ticket-icon.blue { background: #3b82f6; }
+        .ticket-icon.green { background: #10b981; }
+        .ticket-icon.orange { background: #f97316; }
+        .ticket-icon.purple { background: #8b5cf6; }
+
+        .ticket-details {
+            flex: 1;
+        }
+
+        .ticket-details h3 {
+            font-size: 20px;
+            color: #111827;
+            margin-bottom: 2px;
+        }
+
+        .ticket-details p {
+            font-size: 14px;
+            color: #6b7280;
+        }
+
+        .ticket-price {
+            font-size: 24px;
+            font-weight: bold;
+            color: #111827;
+        }
+
+        .payment-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .payment-btn {
+            padding: 20px;
+            border: 4px solid #e5e7eb;
+            border-radius: 12px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .payment-btn:hover {
+            border-color: #d1d5db;
+        }
+
+        .payment-btn.selected {
+            border-color: #dc2626;
+            background: white;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .payment-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .payment-icon.blue { background: #3b82f6; }
+        .payment-icon.green { background: #10b981; }
+
+        .payment-details {
+            flex: 1;
+        }
+
+        .payment-details h3 {
+            font-size: 20px;
+            color: #111827;
+            margin-bottom: 2px;
+        }
+
+        .payment-details p {
+            font-size: 14px;
+            color: #6b7280;
+        }
+
+        .payment-check {
+            font-size: 28px;
+            color: #dc2626;
+        }
+
+        .summary-card {
+            background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+            border-radius: 12px;
+            padding: 32px;
+            color: white;
+            margin-top: auto;
+        }
+
+        .summary-amount {
+            margin-bottom: 24px;
+        }
+
+        .summary-amount p {
+            opacity: 0.9;
+            margin-bottom: 8px;
+            font-size: 16px;
+        }
+
+        .summary-price {
+            font-size: 64px;
+            font-weight: bold;
+        }
+
+        .summary-details {
+            border-top: 1px solid rgba(255, 255, 255, 0.3);
+            padding-top: 16px;
+            margin-bottom: 24px;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 16px;
+        }
+
+        .summary-row span:first-child {
+            opacity: 0.9;
+        }
+
+        .btn-purchase {
+            width: 100%;
+            padding: 20px;
+            border: none;
+            border-radius: 8px;
+            background: white;
+            color: #dc2626;
+            font-size: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-purchase:hover {
+            background: #f3f4f6;
+        }
+
+        .summary-placeholder {
+            text-align: center;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+        }
+
+        .summary-placeholder p {
+            opacity: 0.9;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        /* Persona Selection Page */
+.persona-page {
+    padding: 48px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.persona-header {
+    text-align: center;
+    margin-bottom: 48px;
+}
+
+.persona-header h2 {
+    font-size: 32px;
+    color: #111827;
+    margin-bottom: 8px;
+}
+
+.persona-header p {
+    font-size: 18px;
+    color: #6b7280;
+}
+
+.persona-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    width: 100%;
+    max-width: 900px;
+    margin-bottom: 32px;
+}
+
+.persona-btn {
+    padding: 32px;
+    border: 4px solid #e5e7eb;
+    border-radius: 12px;
+    background: white;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+}
+
+.persona-btn:hover {
+    border-color: #dc2626;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    transform: scale(1.02);
+}
+
+.persona-btn.selected {
+    border-color: #3b82f6;
+    background: #eff6ff;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    transform: scale(1.03);
+}
+
+.persona-icon {
+    width: 80px;
+    height: 80px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 36px;
+    color: white;
+    font-weight: bold;
+}
+
+.persona-icon.blue { background: #3b82f6; }
+.persona-icon.green { background: #10b981; }
+.persona-icon.orange { background: #f97316; }
+
+.persona-info h3 {
+    font-size: 24px;
+    color: #111827;
+    margin-bottom: 4px;
+}
+
+.persona-info p {
+    font-size: 16px;
+    color: #6b7280;
+    text-align: center;
+}
+
+/* Info box below personas */
+.persona-page .info-box {
+    background: #dbeafe;
+    border-left: 4px solid #3b82f6;
+    padding: 16px;
+    border-radius: 8px;
+    display: flex;
+    gap: 12px;
+    max-width: 900px;
+    width: 100%;
+}
+#languagePage {
+    overflow: hidden;
+}
+#zonePage{
+    overflow: hidden;
+}
+
+
+    </style>
+</head>
+<body>
+    <div class="machine-container">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-left">
+                <div class="logo">BVG</div>
+                <div class="header-title">
+                    <h1>Berlin Public Transport</h1>
+                    <p>Ticket Purchase</p>
+                </div>
+            </div>
+            <div class="lang-badge hidden" id="langBadge"></div>
+        </div>
+
+        <!-- Content -->
+        <div class="content">
+            <!-- Language Selection Page -->
+            <div class="page active" id="languagePage">
+                <div class="language-page">
+                    <div class="language-header">
+                        <div class="language-icon">🌐</div>
+                        <h2>Select Language</h2>
+                        <p>Sprache wählen • Choisir la langue</p>
+                    </div>
+                    
+                    <div class="language-grid">
+                        <button class="language-btn" onclick="selectLanguage('en')">
+                            <div class="language-flag">🇬🇧</div>
+                            <div class="language-name">
+                                <h3>English</h3>
+                                <p>English</p>
+                            </div>
+                        </button>
+                        
+                        <button class="language-btn" onclick="selectLanguage('de')">
+                            <div class="language-flag">🇩🇪</div>
+                            <div class="language-name">
+                                <h3>German</h3>
+                                <p>Deutsch</p>
+                            </div>
+                        </button>
+                        
+                        <button class="language-btn" onclick="selectLanguage('fr')">
+                            <div class="language-flag">🇫🇷</div>
+                            <div class="language-name">
+                                <h3>French</h3>
+                                <p>Français</p>
+                            </div>
+                        </button>
+                        
+                        <button class="language-btn" onclick="selectLanguage('ru')">
+                            <div class="language-flag">🇷🇺</div>
+                            <div class="language-name">
+                                <h3>Russian</h3>
+                                <p>Русский</p>
+                            </div>
+                        </button>
+                        
+                        <button class="language-btn" onclick="selectLanguage('tr')">
+                            <div class="language-flag">🇹🇷</div>
+                            <div class="language-name">
+                                <h3>Turkish</h3>
+                                <p>Türkçe</p>
+                            </div>
+                        </button>
+                    </div>
+                    
+                </div>
+            </div>
+
+            <!-- Zone Selection Page -->
+            <div class="page" id="zonePage">
+                <div class="zone-page">
+                    <div class="zone-header">
+                        <h2>Select Your Fare Zone</h2>
+                        <p>Choose the zone for your journey</p>
+                    </div>
+                    
+                    <div class="zone-list">
+                        <button class="zone-btn" onclick="selectZone('AB')">
+                            <div class="zone-icon blue">AB</div>
+                            <div class="zone-info">
+                                <h3>Zone AB</h3>
+                                <p class="description">Berlin City Center</p>
+                                <p class="coverage">Within Berlin city limits including S-Bahn Ring</p>
+                            </div>
+                            <span class="zone-check hidden">✓</span>
+                        </button>
+                        
+                        <button class="zone-btn" onclick="selectZone('BC')">
+                            <div class="zone-icon green">BC</div>
+                            <div class="zone-info">
+                                <h3>Zone BC</h3>
+                                <p class="description">Berlin Surroundings</p>
+                                <p class="coverage">From city limits to Brandenburg region</p>
+                            </div>
+                            <span class="zone-check hidden">✓</span>
+                        </button>
+                        
+                        <button class="zone-btn" onclick="selectZone('ABC')">
+                            <div class="zone-icon purple">ABC</div>
+                            <div class="zone-info">
+                                <h3>Zone ABC</h3>
+                                <p class="description">Complete Area</p>
+                                <p class="coverage">All Berlin zones including Potsdam & surrounding areas</p>
+                            </div>
+                            <span class="zone-check hidden">✓</span>
+                        </button>
+                    </div>
+                    
+                    <div class="warning-box">
+                        <strong>Note:</strong>
+                        <p>Zone A covers the city center (S-Bahn Ring), Zone B extends to Berlin city limits, and Zone C includes surrounding Brandenburg areas.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Persona Selection Page -->
+<div class="page" id="personaPage">
+    <div class="persona-page">
+        <div class="persona-header">
+            <h2>Select Persona</h2>
+            <p>Choose the ticket type that fits you</p>
+        </div>
+
+        <div class="persona-grid">
+            <button class="persona-btn" onclick="selectPersona('student')">
+                <div class="persona-icon blue">🎓</div>
+                <div class="persona-info">
+                    <h3>Student</h3>
+                    <p>Discounted fares for students</p>
+                </div>
+            </button>
+
+            <button class="persona-btn" onclick="selectPersona('regular')">
+                <div class="persona-icon green">👤</div>
+                <div class="persona-info">
+                    <h3>Regular</h3>
+                    <p>Standard fares for adults</p>
+                </div>
+            </button>
+
+            <button class="persona-btn" onclick="selectPersona('child')">
+                <div class="persona-icon orange">🧒</div>
+                <div class="persona-info">
+                    <h3>Child</h3>
+                    <p>Discounted fares for children</p>
+                </div>
+            </button>
+        </div>
+
+        <div class="info-box" style="margin-top: 16px;">
+            <span class="info-icon">ℹ️</span>
+            <div class="info-text">
+                <strong>Tip:</strong> Student and Child tickets are cheaper, make sure to select the correct persona.
+            </div>
+        </div>
+    </div>
+</div>
+
+
+            <!-- Ticket Purchase Page -->
+            <div class="page" id="purchasePage">
+                <div class="purchase-page">
+                    <!-- Left: Ticket Selection -->
+                    <div class="ticket-section">
+                        <div class="section-header">
+                            <div class="zone-badge">Zone: <strong id="selectedZoneDisplay">AB</strong></div>
+                            <h2>Select Ticket Type</h2>
+                            <p>Choose your ticket duration</p>
+                        </div>
+                        
+                        <div class="ticket-list">
+                            <button class="ticket-btn" onclick="selectTicket('single')">
+                                <div class="ticket-icon blue">🎫</div>
+                                <div class="ticket-details">
+                                    <h3>Single Ticket</h3>
+                                    <p>Valid for 2 hours, one direction</p>
+                                </div>
+                                <div class="ticket-price" id="price-single">€3.20</div>
+                            </button>
+
+                            <div style="margin-top:16px; display:flex; align-items:center; gap:16px;">
+                                <strong>Quantity:</strong>
+                                <button onclick="changeQuantity(-1)" style="padding:8px 16px;">−</button>
+                                <span id="ticketQuantity">1</span>
+                                <button onclick="changeQuantity(1)" style="padding:8px 16px;">+</button>
+                            </div>
+
+                            
+                            <button class="ticket-btn" onclick="selectTicket('day')">
+                                <div class="ticket-icon green">📅</div>
+                                <div class="ticket-details">
+                                    <h3>Day Pass</h3>
+                                    <p>Valid until 3 AM next day</p>
+                                </div>
+                                <div class="ticket-price" id="price-day">€8.80</div>
+                            </button>
+                            
+                            <button class="ticket-btn" onclick="selectTicket('week')">
+                                <div class="ticket-icon orange">📆</div>
+                                <div class="ticket-details">
+                                    <h3>7-Day Pass</h3>
+                                    <p>Valid for 7 consecutive days</p>
+                                </div>
+                                <div class="ticket-price" id="price-week">€36.00</div>
+                            </button>
+                            
+                            <button class="ticket-btn" onclick="selectTicket('month')">
+                                <div class="ticket-icon purple">📋</div>
+                                <div class="ticket-details">
+                                    <h3>Monthly Pass</h3>
+                                    <p>Valid for 30 days from purchase</p>
+                                </div>
+                                <div class="ticket-price" id="price-month">€86.00</div>
+                            </button>
+                        </div>
+                        
+                        <div class="info-box" style="margin-top: 16px;">
+                            <span class="info-icon">ℹ️</span>
+                            <div class="info-text">
+                                <strong>Tip:</strong> Day Pass is best value for 3+ trips per day!
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Right: Payment & Summary -->
+                    <div class="payment-section">
+                        <div class="section-header">
+                            <h2>Payment Method</h2>
+                            <p>Select how you want to pay</p>
+                        </div>
+                        
+                        <div class="payment-list">
+                            <button class="payment-btn" onclick="selectPayment('card')">
+                                <div class="payment-icon blue">💳</div>
+                                <div class="payment-details">
+                                    <h3>Card Payment</h3>
+                                    <p>Credit/Debit/EC-Card</p>
+                                </div>
+                                <span class="payment-check hidden">✓</span>
+                            </button>
+                            
+                            <button class="payment-btn" onclick="selectPayment('cash')">
+                                <div class="payment-icon green">💵</div>
+                                <div class="payment-details">
+                                    <h3>Cash Payment</h3>
+                                    <p>Bills and coins</p>
+                                </div>
+                                <span class="payment-check hidden">✓</span>
+                            </button>
+                        </div>
+                        
+                        <div class="summary-card">
+                            <div class="summary-amount">
+                                <p>Total Amount</p>
+                                <div class="summary-price" id="totalPrice">€0.00</div>
+                            </div>
+                            
+                            <div class="summary-details hidden" id="summaryDetails">
+                                <div class="summary-row">
+                                    <span>Ticket:</span>
+                                    <span id="summaryTicket">-</span>
+                                </div>
+                                <div class="summary-row">
+                                    <span>Zone:</span>
+                                    <span id="summaryZone">-</span>
+                                </div>
+                            </div>
+                            
+                            <button class="btn-purchase hidden" id="purchaseBtn" onclick="completePurchase()">
+                                Complete Purchase
+                            </button>
+                            
+                            <div class="summary-placeholder" id="summaryPlaceholder">
+                                <p>Select a ticket type and payment method</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer" id="footer">
+            <button class="btn btn-back hidden" id="backBtn" onclick="goBack()">← Back</button>
+            <button class="btn btn-continue hidden" id="continueBtn" onclick="goNext()">Continue →</button>
+        </div>
+    </div>
+
+<script>
+    // Application State
+    const state = {
+        currentPage: 'language',
+        selectedLanguage: null,
+        selectedZone: null,
+        selectedPersona: null,
+        selectedTicket: null,
+        selectedPayment: null,
+        currentPrice: 0,
+        ticketQuantity: 1
+    };
+
+    // Ticket Prices (base)
+    const prices = {
+        single: { AB: 3.20, BC: 3.50, ABC: 4.00 },
+        day: { AB: 8.80, BC: 9.20, ABC: 10.00 },
+        week: { AB: 36.00, BC: 37.50, ABC: 43.00 },
+        month: { AB: 86.00, BC: 91.00, ABC: 107.00 }
+    };
+
+    const ticketNames = {
+        single: 'Single Ticket',
+        day: 'Day Pass',
+        week: '7-Day Pass',
+        month: 'Monthly Pass'
+    };
+
+    // Persona Discounts
+    const personaDiscounts = {
+        student: 0.5,
+        child: 0.7,
+        regular: 1
+    };
+
+    // Language Data
+    const lang_en = {
+        header: { title: "Berlin Public Transport", subtitle: "Ticket Purchase" },
+        languagePage: { header: "Select Language", subheader: "Choose your preferred language to continue", info: "Welcome to BVG Ticket Machine. Please select your preferred language to continue." },
+        zonePage: { header: "Select Your Fare Zone", subheader: "Choose the zone for your journey", note: "Zone A covers the city center (S-Bahn Ring), Zone B extends to Berlin city limits, and Zone C includes surrounding Brandenburg areas." },
+        personaPage: { header: "Select Persona", subheader: "Choose the ticket type that fits you", tip: "Student and Child tickets are cheaper, make sure to select the correct persona." },
+        purchasePage: { ticketHeader: "Select Ticket Type", ticketSubheader: "Choose your ticket duration", ticketTip: "Day Pass is best value for 3+ trips per day!", paymentHeader: "Payment Method", paymentSubheader: "Select how you want to pay", summary: { total: "Total Amount", ticket: "Ticket", zone: "Zone", placeholder: "Select a ticket type and payment method", completeBtn: "Complete Purchase" } },
+        footer: { back: "← Back", continue: "Continue →" }
+    };
+
+    const lang_de = {
+        header: { title: "Berliner Verkehrsbetriebe", subtitle: "Ticketkauf" },
+        languagePage: { header: "Sprache wählen", subheader: "Wählen Sie Ihre bevorzugte Sprache aus, um fortzufahren", info: "Willkommen am BVG Ticketautomat. Bitte wählen Sie Ihre bevorzugte Sprache aus, um fortzufahren." },
+        zonePage: { header: "Wählen Sie Ihre Tarifzone", subheader: "Wählen Sie die Zone für Ihre Reise", note: "Zone A deckt das Stadtzentrum (S-Bahn-Ring) ab, Zone B erweitert sich bis zu den Stadtgrenzen, und Zone C umfasst die umliegenden Brandenburg-Gebiete." },
+        personaPage: { header: "Persona auswählen", subheader: "Wählen Sie den Tickettyp, der zu Ihnen passt", tip: "Studenten- und Kindertickets sind günstiger, stellen Sie sicher, dass Sie die richtige Persona auswählen." },
+        purchasePage: { ticketHeader: "Tickettyp auswählen", ticketSubheader: "Wählen Sie Ihre Ticketdauer", ticketTip: "Die Tageskarte ist am besten bei 3+ Fahrten pro Tag!", paymentHeader: "Zahlungsmethode", paymentSubheader: "Wählen Sie, wie Sie bezahlen möchten", summary: { total: "Gesamtbetrag", ticket: "Ticket", zone: "Zone", placeholder: "Wählen Sie Tickettyp und Zahlungsmethode aus", completeBtn: "Kauf abschließen" } },
+        footer: { back: "← Zurück", continue: "Weiter →" }
+    };
+
+    const lang_fr = {
+        header: { title: "Entreprise de transport berlinoise", subtitle: "Achat de billets" },
+        languagePage: { header: "Choisissez votre langue", subheader: "Sélectionnez votre langue préférée pour continuer", info: "Bienvenue à l'automate de billetterie BVG. Veuillez sélectionner votre langue préférée pour continuer." },
+        zonePage: { header: "Choisissez votre zone tarifaire", subheader: "Sélectionnez la zone pour votre trajet", note: "La zone A couvre le centre-ville (cercle S-Bahn), la zone B s'étend jusqu'aux limites de la ville, et la zone C comprend les territoires environnants de Brandebourg." },
+        personaPage: { header: "Sélectionnez une personne", subheader: "Choisissez le type de ticket qui vous convient", tip: "Les billets d'étudiant et d'enfant sont moins chers, assurez-vous de sélectionner la bonne personne." },
+        purchasePage: { ticketHeader: "Sélectionnez un type de ticket", ticketSubheader: "Choisissez la durée de votre ticket", ticketTip: "Le pass journalier est le plus avantageux pour 3+ trajets par jour !", paymentHeader: "Méthode de paiement", paymentSubheader: "Sélectionnez comment vous souhaitez payer", summary: { total: "Montant total", ticket: "Ticket", zone: "Zone", placeholder: "Sélectionnez un type de ticket et une méthode de paiement", completeBtn: "Finaliser l'achat" } },
+        footer: { back: "← Précédent", continue: "Suivant →" } 
+    };
+    
+    const lang_ru = {
+        header: { title: "Берлинский общественный транспорт", subtitle: "Покупка билета" },
+        languagePage: { header: "Выберите язык", subheader: "Выберите предпочитаемый язык для продолжения", info: "Добро пожаловать к билетному автомату BVG. Пожалуйста, выберите предпочитаемый язык для продолжения." },
+        zonePage: { header: "Выберите тарифную зону", subheader: "Выберите зону для вашего путешествия", note: "Зона A охватывает центр города (кольцо S-Bahn), зона B простирается до границ Берлина, а зона C включает прилегающие районы Бранденбурга." },
+        personaPage: { header: "Выберите персонажа", subheader: "Выберите тип билета, который вам подходит", tip: "Билеты для студентов и детей дешевле, убедитесь, что выбрали правильного персонажа." },
+        purchasePage: { ticketHeader: "Выберите тип билета", ticketSubheader: "Выберите продолжительность вашего билета", ticketTip: "Дневной проездной - лучший выбор для 3+ поездок в день!", paymentHeader: "Способ оплаты", paymentSubheader: "Выберите способ оплаты", summary: { total: "Общая сумма", ticket: "Билет", zone: "Зона", placeholder: "Выберите тип билета и способ оплаты", completeBtn: "Завершить покупку" } },
+        footer: { back: "← Назад", continue: "Продолжить →" }
+    };
+
+    const lang_tr = {
+        header: { title: "berlin toplu taşıma", subtitle: "Bilet satın al" },
+        languagePage: { header: "Dilinizi seçin", subheader: "Devam etmek için tercih ettiğiniz dili seçin", info: "BVG bilet otomata hoş geldiniz. Devam etmek için tercih ettiğiniz dili seçin." },
+        zonePage: { header: "Tarife bölgesini seçin", subheader: "Yolculuğunuz için bölgeyi seçin", note: "A bölgesi şehir merkezini (S-Bahn halkası) kapsar, B bölgesi Berlin'in sınırlarına kadar uzanır ve C bölgesi Brandenburg'un çevresindeki bölgeleri içerir." },
+        personaPage: { header: "Bir kişiyi seçin", subheader: "Size uygun bilet türünü seçin", tip: "Öğrenci ve çocuk biletleri daha ucuza, doğru kişiyi seçtiğinizden emin olun." },
+        purchasePage: { ticketHeader: "Bilet türünü seçin", ticketSubheader: "Bileti satın almak için süreyi seçin", ticketTip: "Günlük geçiş bileti 3+ seyahat için en iyi seçimdir!", paymentHeader: "Ödeme yöntemi", paymentSubheader: "Nasıl ödeme yapmak istediğinizi seçin", summary: { total: "Toplam tutar", ticket: "Bilet", zone: "Bölge", placeholder: "Bilet türü ve ödeme yöntemi seçin", completeBtn: "Satın almayı tamamla" } },
+        footer: { back: "< Geri", continue: "İleri >" }
+    };
+
+
+    let currentLang = lang_en;
+
+    // Set language dynamically
+    function setLanguage(lang) {
+        currentLang = lang === 'de' ? lang_de : lang === 'fr' ? lang_fr : lang === 'ru' ? lang_ru : lang_tr;
+
+        document.querySelector('.header-title h1').textContent = currentLang.header.title;
+        document.querySelector('.header-title p').textContent = currentLang.header.subtitle;
+        document.querySelector('#zonePage .zone-header h2').textContent = currentLang.zonePage.header;
+        document.querySelector('#zonePage .zone-header p').textContent = currentLang.zonePage.subheader;
+        document.querySelector('#zonePage .warning-box p').textContent = currentLang.zonePage.note;
+        document.querySelector('#personaPage .persona-header h2').textContent = currentLang.personaPage.header;
+        document.querySelector('#personaPage .persona-header p').textContent = currentLang.personaPage.subheader;
+        document.querySelector('#personaPage .info-text').textContent = currentLang.personaPage.tip;
+        document.querySelector('#purchasePage .ticket-section h2').textContent = currentLang.purchasePage.ticketHeader;
+        document.querySelector('#purchasePage .ticket-section p').textContent = currentLang.purchasePage.ticketSubheader;
+        document.querySelector('#purchasePage .ticket-section .info-text').textContent = currentLang.purchasePage.ticketTip;
+        document.querySelector('#purchasePage .payment-section h2').textContent = currentLang.purchasePage.paymentHeader;
+        document.querySelector('#purchasePage .payment-section p').textContent = currentLang.purchasePage.paymentSubheader;
+        document.querySelector('#purchasePage .summary-card .summary-amount p').textContent = currentLang.purchasePage.summary.total;
+        document.getElementById('summaryPlaceholder').querySelector('p').textContent = currentLang.purchasePage.summary.placeholder;
+        document.getElementById('purchaseBtn').textContent = currentLang.purchasePage.summary.completeBtn;
+        document.getElementById('backBtn').textContent = currentLang.footer.back;
+        document.getElementById('continueBtn').textContent = currentLang.footer.continue;
+    }
+
+    /************* LANGUAGE SELECTION *************/
+    function selectLanguage(lang) {
+        state.selectedLanguage = lang;
+        document.getElementById('langBadge').textContent = lang.toUpperCase();
+        document.getElementById('langBadge').classList.remove('hidden');
+        setLanguage(lang);
+        goToPage('zone');
+    }
+
+    /************* ZONE SELECTION *************/
+    function selectZone(zone) {
+        state.selectedZone = zone;
+        document.querySelectorAll('.zone-btn').forEach(btn => { btn.classList.remove('selected'); btn.querySelector('.zone-check').classList.add('hidden'); });
+        event.currentTarget.classList.add('selected');
+        event.currentTarget.querySelector('.zone-check').classList.remove('hidden');
+        document.getElementById('continueBtn').classList.remove('hidden');
+        updatePrices();
+    }
+
+    /************* PERSONA SELECTION *************/
+    function selectPersona(persona) {
+        state.selectedPersona = persona;
+        document.querySelectorAll('.persona-btn').forEach(btn => btn.classList.remove('selected'));
+        event.currentTarget.classList.add('selected');
+        document.getElementById('continueBtn').classList.remove('hidden');
+        updatePrices();
+    }
+
+    /************* TICKET SELECTION *************/
+    function selectTicket(ticket) {
+        state.selectedTicket = ticket;
+        state.ticketQuantity = 1;
+        document.getElementById('ticketQuantity').textContent = 1;
+
+        document.querySelectorAll('.ticket-btn').forEach(btn => btn.classList.remove('selected'));
+        event.currentTarget.classList.add('selected');
+
+        updateSummary();
+    }
+
+
+    /************* PAYMENT SELECTION *************/
+    function selectPayment(payment) {
+        state.selectedPayment = payment;
+        document.querySelectorAll('.payment-btn').forEach(btn => { btn.classList.remove('selected'); btn.querySelector('.payment-check').classList.add('hidden'); });
+        event.currentTarget.classList.add('selected');
+        event.currentTarget.querySelector('.payment-check').classList.remove('hidden');
+        updateSummary();
+    }
+
+    /************* UPDATE PRICES *************/
+    function updatePrices() {
+        if (!state.selectedZone) return;
+        document.getElementById('selectedZoneDisplay').textContent = state.selectedZone;
+
+        Object.keys(prices).forEach(ticket => {
+            let basePrice = prices[ticket][state.selectedZone];
+            let discount = state.selectedPersona ? personaDiscounts[state.selectedPersona] : 1;
+            let finalPrice = basePrice * discount;
+            document.getElementById(`price-${ticket}`).textContent = `€${finalPrice.toFixed(2)}`;
+        });
+
+        if (state.selectedTicket) updateSummary();
+
+        
+    }
+
+    /************* UPDATE SUMMARY *************/
+function changeQuantity(delta) {
+    if (!state.selectedTicket) return;
+
+    state.ticketQuantity += delta;
+
+    if (state.ticketQuantity < 1) {
+        state.ticketQuantity = 1;
+    }
+
+    document.getElementById('ticketQuantity').textContent = state.ticketQuantity;
+    updateSummary();
+}
+    function updateSummary() {
+        const hasTicket = !!state.selectedTicket;
+        const hasPayment = !!state.selectedPayment; 
+
+
+        if (hasTicket) {
+            let basePrice = prices[state.selectedTicket][state.selectedZone];
+            let discount = state.selectedPersona ? personaDiscounts[state.selectedPersona] : 1;
+            state.currentPrice = basePrice * discount * state.ticketQuantity;
+;
+
+            document.getElementById('totalPrice').textContent = `€${state.currentPrice.toFixed(2)}`;
+            document.getElementById('summaryTicket').textContent =
+            `${ticketNames[state.selectedTicket]} × ${state.ticketQuantity}`;
+
+            document.getElementById('summaryZone').textContent = state.selectedZone;
+            document.getElementById('summaryDetails').classList.remove('hidden');
+        } else {
+            document.getElementById('totalPrice').textContent = '€0.00';
+            document.getElementById('summaryDetails').classList.add('hidden');
+        }
+
+        if (hasTicket && hasPayment) {
+            document.getElementById('purchaseBtn').classList.remove('hidden');
+            document.getElementById('summaryPlaceholder').classList.add('hidden');
+        } else {
+            document.getElementById('purchaseBtn').classList.add('hidden');
+            document.getElementById('summaryPlaceholder').classList.remove('hidden');
+            document.getElementById('summaryPlaceholder').textContent = !hasTicket ? (currentLang.purchasePage.summary.placeholder) : 'Select payment method';
+        }
+    }
+
+    /************* COMPLETE PURCHASE *************/
+    function completePurchase() {
+        alert(`Ticket purchased successfully!\nTotal: €${state.currentPrice.toFixed(2)}\nThank you for using BVG.`);
+        resetApp();
+    }
+
+    /************* NAVIGATION *************/
+    function goToPage(page) {
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        document.getElementById(page + 'Page').classList.add('active');
+        state.currentPage = page;
+        updateFooter();
+    }
+
+    function goNext() {
+        if (state.currentPage === 'zone' && state.selectedZone) goToPage('persona');
+        else if (state.currentPage === 'persona' && state.selectedPersona) goToPage('purchase');
+    }
+
+    function goBack() {
+        if (state.currentPage === 'zone') { state.selectedLanguage = null; document.getElementById('langBadge').classList.add('hidden'); goToPage('language'); }
+        else if (state.currentPage === 'persona') { goToPage('zone'); document.getElementById('continueBtn').classList.remove('hidden'); }
+        else if (state.currentPage === 'purchase') { goToPage('persona'); }
+    }
+
+    function updateFooter() {
+        const backBtn = document.getElementById('backBtn');
+        const continueBtn = document.getElementById('continueBtn');
+        backBtn.classList.remove('hidden'); continueBtn.classList.add('hidden');
+        if (state.currentPage === 'zone' && state.selectedZone) continueBtn.classList.remove('hidden');
+        if (state.currentPage === 'persona' && state.selectedPersona) continueBtn.classList.remove('hidden');
+        if (state.currentPage === 'language') backBtn.classList.add('hidden');
+    }
+
+    /************* RESET APP *************/
+    function resetApp() {
+        state.currentPage = 'language'; state.selectedLanguage = null; state.selectedZone = null; state.selectedPersona = null;
+        state.selectedTicket = null; state.selectedPayment = null; state.currentPrice = 0;
+
+        document.getElementById('langBadge').classList.add('hidden');
+        document.querySelectorAll('.zone-btn').forEach(btn => { btn.classList.remove('selected'); btn.querySelector('.zone-check').classList.add('hidden'); });
+        document.querySelectorAll('.persona-btn').forEach(btn => btn.classList.remove('selected'));
+        document.querySelectorAll('.ticket-btn').forEach(btn => btn.classList.remove('selected'));
+        document.querySelectorAll('.payment-btn').forEach(btn => { btn.classList.remove('selected'); btn.querySelector('.payment-check').classList.add('hidden'); });
+
+        goToPage('language');
+    }
+
+    // Initialize
+    updateFooter();
+</script>
+
+
+
+</body>
+</html>
